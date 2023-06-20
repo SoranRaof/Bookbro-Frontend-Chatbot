@@ -30,11 +30,11 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
   let counter = 0;
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
-    method: "POST",
     body: JSON.stringify(payload),
   });
 
@@ -51,7 +51,9 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
           }
           try {
             const json = JSON.parse(data);
+            console.log("json", json);
             const text = json.choices[0].delta?.content || "";
+            console.log("text", text);
             if (counter < 2 && (text.match(/\n/) || []).length) {
               // this is a prefix character (i.e., "\n\n"), do nothing
               return;
@@ -59,9 +61,9 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
             const queue = encoder.encode(text);
             controller.enqueue(queue);
             counter++;
-          } catch (e) {
+          } catch (error) {
             // maybe parse error
-            controller.error(e);
+            controller.error(error);
           }
         }
       }

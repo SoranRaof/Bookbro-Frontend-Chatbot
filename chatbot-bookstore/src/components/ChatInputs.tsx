@@ -20,7 +20,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
         },
         body: JSON.stringify({ messages: [message] }),
       });
-
+      console.log("response body", response.body);
       return response.body;
     },
     onSuccess: () => {
